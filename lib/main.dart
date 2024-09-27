@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/booking_overview_page.dart';
-import 'package:flutter_application_1/pages/week_view.dart';
+import 'pages/booking_overview_page.dart';
+import 'pages/week_view.dart';
 import 'pages/home_page.dart';
 import 'data/booked_slots.dart';
 
