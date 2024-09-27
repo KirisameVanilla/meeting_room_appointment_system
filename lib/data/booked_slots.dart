@@ -1,0 +1,1 @@
+List<List<Set<String>>> bookedSlots = List.generate(3, (_) => List.generate(7, (_) => {}));
