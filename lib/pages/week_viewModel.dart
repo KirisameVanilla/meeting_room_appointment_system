@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/time_slot_widget.dart';
-import '../data/booked_slots.dart'; // 导入 booked_slots.dart
+import '../models/time_slot_model.dart';
+import '../data/booked_slots_model.dart'; // 导入 booked_slots.dart
 
 class WeekView extends StatefulWidget {
   @override
