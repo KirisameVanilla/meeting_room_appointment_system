@@ -21,7 +21,7 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
       theme: ThemeData.light(),
       initialRoute: '/',
       routes: {
-        '/': (context) => HomePage(),
+        '/': (context) => HomePageWidget(),
         '/book': (context) => BookPage(),
         '/overview': (context) => BookingOverviewPage(
           bookedSlots: bookedSlots,
@@ -33,6 +33,7 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
           ], // 时间块
         ),
       },
+      
     );
   }
 }
