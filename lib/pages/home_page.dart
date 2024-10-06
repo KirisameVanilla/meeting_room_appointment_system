@@ -18,12 +18,12 @@ class HomePageState extends State<HomePageWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _formKey,
+      
       appBar: AppBar(title: Text('会议室预定系统')),
       drawer: AppDrawer(),
       
       body: Form(
-        
+        key: _formKey,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           children: [
@@ -38,9 +38,31 @@ class HomePageState extends State<HomePageWidget> {
                 if (!emailReg.hasMatch(v!)) {
                   return '请输入正确的邮箱地址';
                 }
+                return '';
               },
               //onSaved: (v) => _email = v!,
-              
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              decoration: const InputDecoration(labelText: 'Password'),
+              validator: (passwordValidator) {
+                var pwdReg = RegExp(
+                    r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#^+=~])[A-Za-z\d@$!%*?&#^+=~]{8,}$");
+                var specialRegFirst = RegExp(
+                  r"[-]{2,}"
+                );
+                var specialRegSecond = RegExp(
+                  r"[;<>]{1,}"
+                );
+                if(specialRegFirst.hasMatch(passwordValidator!)||specialRegSecond.hasMatch(passwordValidator)){
+                  return '我是来写网站的，你想干什么？补药注入我口牙';
+                }
+                if (!pwdReg.hasMatch(passwordValidator)) {
+                  return '密码错误或不符合要求';
+                }
+                return '';
+              },
+              //onSaved: (v) => _email = v!,
             ),
             ElevatedButton(
               onPressed: () {
@@ -49,7 +71,13 @@ class HomePageState extends State<HomePageWidget> {
                   // If the form is valid, display a snackbar. In the real world,
                   // you'd often call a server or save the information in a database.
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing Data')),
+                    SnackBar(content: Text('Validation Passed')),
+                  );
+                }
+                else {
+                  // 如果验证失败，也可以给出提示
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Validation Failed')),
                   );
                 }
               },
