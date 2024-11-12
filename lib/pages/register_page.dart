@@ -1,19 +1,19 @@
-import 'register_page.dart';
+
 import 'package:flutter/material.dart';
 import '../main.dart';// 新增的周视图组件
 import '../api_service.dart';
 
-class HomePageWidget extends StatefulWidget {
-  const HomePageWidget({super.key});
+class RegisterPageWidget extends StatefulWidget {
+  const RegisterPageWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {
     // 将创建的State返回
-    return HomePageState();
+    return RegisterPageState();
   }
 }
 
-class HomePageState extends State<HomePageWidget> {
+class RegisterPageState extends State<RegisterPageWidget> {
   
   final _formKey = GlobalKey<FormState>();
   final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); // 设置后端 URL
@@ -79,7 +79,7 @@ class HomePageState extends State<HomePageWidget> {
                   );
                   _formKey.currentState!.save(); 
                   print(_email);print(_pwd);
-                  apiService.loginUser(_email,_pwd);
+                  apiService.registerUser(_email,_pwd);
                 }
                 else {
                   // 如果验证失败，也可以给出提示
@@ -90,20 +90,6 @@ class HomePageState extends State<HomePageWidget> {
               },
               child: const Text('Submit'),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end, // 使按钮右对齐
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterPageWidget()), // 替换为你的注册页面
-                    );
-                  },
-                  child: const Text('Register', style: TextStyle(fontSize: 16)),
-                ),
-              ],
-            ),
           ],
         ))
     );
@@ -111,11 +97,11 @@ class HomePageState extends State<HomePageWidget> {
 }
 
 Widget buildTitle() {
-  return const Padding(
-      // 设置边距
+  return const Padding( // 设置边距
       padding: EdgeInsets.all(8),
       child: Text(
-        'Login',
+        'Register',
         style: TextStyle(fontSize: 42),
       ));
 }
+

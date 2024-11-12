@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meeting_room_booking_system/pages/booking_page.dart';
 import 'pages/booking_overview_page.dart';
+import 'pages/register_page.dart';
 import 'pages/home_page.dart';
 import 'data/booked_slots_model.dart';
 
@@ -17,11 +18,12 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '会议室预定系统',
+      title: 'Meeting room appointment system',
       theme: ThemeData.light(),
       initialRoute: '/',
       routes: {
         '/': (context) => HomePageWidget(),
+        '/register': (context) => RegisterPageWidget(),
         '/book': (context) => BookPage(),
         '/overview': (context) => BookingOverviewPage(
           bookedSlots: bookedSlots,
@@ -33,7 +35,6 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
           ], // 时间块
         ),
       },
-      
     );
   }
 }
