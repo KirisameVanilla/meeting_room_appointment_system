@@ -10,7 +10,7 @@ basedir = os.path.abspath(os.path.dirname(__name__))
 app = Flask(__name__)
 CORS(app) # 防止跨域报错
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'user.db')  # 使用 SQLite 数据库
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'db/user.db')  # 使用 SQLite 数据库
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret'  # 设置 JWT 密钥
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -48,7 +48,7 @@ def register():
         response.headers.add('Access-Control-Allow-Origin', '*')  # 或指定源
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         
-        return response
+        return response, 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500  # 返回详细错误信息
 
