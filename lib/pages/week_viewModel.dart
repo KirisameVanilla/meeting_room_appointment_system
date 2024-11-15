@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/time_slot_model.dart';
+import '../models/user_provider.dart';
 import '../data/booked_slots_model.dart'; // 导入 booked_slots.dart
 
 class WeekView extends StatefulWidget {
@@ -9,9 +11,22 @@ class WeekView extends StatefulWidget {
 
 class WeekViewState extends State<WeekView> {
   final List<String> timeSlots = [
-    '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
-    '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM',
-    '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM'
+    '10:00 AM',
+    '10:30 AM',
+    '11:00 AM',
+    '11:30 AM',
+    '12:00 PM',
+    '12:30 PM',
+    '1:00 PM',
+    '1:30 PM',
+    '2:00 PM',
+    '2:30 PM',
+    '3:00 PM',
+    '3:30 PM',
+    '4:00 PM',
+    '4:30 PM',
+    '5:00 PM',
+    '5:30 PM'
   ];
 
   // 存储每个会议室每天的已预定时间
@@ -28,7 +43,7 @@ class WeekViewState extends State<WeekView> {
     setState(() {
       if (isCancelMode) {
         // 在取消模式下，允许选择已预定的时间块
-        if (bookedSlots[selectedRoomIndex][selectedDayIndex].contains(timeSlot)) {
+        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '') {
           if (selectedSlots.contains(timeSlot)) {
             selectedSlots.remove(timeSlot);
           } else {
@@ -37,7 +52,7 @@ class WeekViewState extends State<WeekView> {
         }
       } else {
         // 正常模式下，选择未预定的时间块
-        if (!bookedSlots[selectedRoomIndex][selectedDayIndex].contains(timeSlot)) {
+        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] == '') {
           if (selectedSlots.contains(timeSlot)) {
             selectedSlots.remove(timeSlot);
           } else {
@@ -51,15 +66,31 @@ class WeekViewState extends State<WeekView> {
   // 预定选中时间块的逻辑
   void bookSelectedSlots() {
     setState(() {
-      bookedSlots[selectedRoomIndex][selectedDayIndex].addAll(selectedSlots);
-      selectedSlots.clear(); // 清空已选中状态
+      try {
+        String? UserName =
+            Provider.of<UserProvider>(context, listen: false).userId;
+        for (var _slot in selectedSlots) {
+          bookedSlots[selectedRoomIndex][selectedDayIndex][_slot] = UserName;
+        }
+
+        selectedSlots.clear(); // 清空已选中状态
+      } catch (e) {
+        print(e);
+      }
     });
   }
 
   // 取消选中预定的逻辑
   void cancelSelectedBookings() {
     setState(() {
-      bookedSlots[selectedRoomIndex][selectedDayIndex].removeAll(selectedSlots);
+      String? UserName =
+          Provider.of<UserProvider>(context, listen: false).userId;
+      for (var _slot in selectedSlots) {
+        if (UserName ==
+            bookedSlots[selectedRoomIndex][selectedDayIndex][_slot]) {
+          bookedSlots[selectedRoomIndex][selectedDayIndex][_slot] = "";
+        }
+      }
       selectedSlots.clear(); // 清空已选中状态
       isCancelMode = false; // 退出取消模式
     });
@@ -70,11 +101,10 @@ class WeekViewState extends State<WeekView> {
     return Row(
       children: [
         IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back)
-        ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back)),
         // 会议室选择按钮
         Column(
           children: List.generate(rooms.length, (index) {
@@ -86,7 +116,8 @@ class WeekViewState extends State<WeekView> {
                 });
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: selectedRoomIndex == index ? Colors.blue : Colors.grey,
+                backgroundColor:
+                    selectedRoomIndex == index ? Colors.blue : Colors.grey,
               ),
               child: Text(rooms[index]),
             );
@@ -107,7 +138,8 @@ class WeekViewState extends State<WeekView> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedDayIndex == index ? Colors.blue : Colors.grey,
+                      backgroundColor:
+                          selectedDayIndex == index ? Colors.blue : Colors.grey,
                     ),
                     child: Text('第${index + 1}天'),
                   );
@@ -126,7 +158,9 @@ class WeekViewState extends State<WeekView> {
                     ),
                     itemBuilder: (context, index) {
                       String timeSlot = timeSlots[index];
-                      bool isBooked = bookedSlots[selectedRoomIndex][selectedDayIndex].contains(timeSlot);
+                      bool isBooked = bookedSlots[selectedRoomIndex]
+                              [selectedDayIndex][timeSlot] !=
+                          '';
                       return TimeSlotWidget(
                         timeSlot: timeSlot,
                         isBooked: isBooked,
@@ -135,6 +169,8 @@ class WeekViewState extends State<WeekView> {
                           selectTimeSlot(timeSlot);
                         },
                         isCancelMode: isCancelMode, // 传递取消模式状态
+                        occupiedBy: bookedSlots[selectedRoomIndex]
+                            [selectedDayIndex][timeSlot],
                       );
                     },
                   ),
@@ -145,16 +181,26 @@ class WeekViewState extends State<WeekView> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed: selectedSlots.isNotEmpty && !isCancelMode ? bookSelectedSlots : null,
+                      onPressed: selectedSlots.isNotEmpty && !isCancelMode
+                          ? bookSelectedSlots
+                          : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: selectedSlots.isNotEmpty && !isCancelMode ? Colors.blue : Colors.grey,
+                        backgroundColor:
+                            selectedSlots.isNotEmpty && !isCancelMode
+                                ? Colors.blue
+                                : Colors.grey,
                       ),
                       child: Text('预定选中的时间块'),
                     ),
                     ElevatedButton(
-                      onPressed: isCancelMode && selectedSlots.isNotEmpty ? cancelSelectedBookings : null,
+                      onPressed: isCancelMode && selectedSlots.isNotEmpty
+                          ? cancelSelectedBookings
+                          : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isCancelMode && selectedSlots.isNotEmpty ? Colors.red : Colors.grey,
+                        backgroundColor:
+                            isCancelMode && selectedSlots.isNotEmpty
+                                ? Colors.red
+                                : Colors.grey,
                       ),
                       child: Text('确认取消选中的预定'),
                     ),
@@ -166,7 +212,8 @@ class WeekViewState extends State<WeekView> {
                         });
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isCancelMode ? Colors.red : Colors.blue,
+                        backgroundColor:
+                            isCancelMode ? Colors.red : Colors.blue,
                       ),
                       child: Text(isCancelMode ? '退出取消模式' : '进入取消模式'),
                     ),

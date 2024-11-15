@@ -6,6 +6,7 @@ class TimeSlotWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback? onTap;
   final bool isCancelMode;
+  final String? occupiedBy;
 
   TimeSlotWidget({
     required this.timeSlot,
@@ -13,6 +14,7 @@ class TimeSlotWidget extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.isCancelMode,
+    required this.occupiedBy,
   });
 
   @override
@@ -22,7 +24,9 @@ class TimeSlotWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: isBooked
-              ? (isCancelMode? (isSelected ? Colors.purple : Colors.orange): Colors.red)
+              ? (isCancelMode
+                  ? (isSelected ? Colors.purple : Colors.orange)
+                  : Colors.red)
               : (isSelected ? Colors.blue : Colors.green),
           borderRadius: BorderRadius.circular(8.0),
         ),
