@@ -24,11 +24,11 @@ class HomePageState extends State<HomePageWidget> {
   String _pwd = "";
   @override
   Widget build(BuildContext context) {
-    String? UserName = Provider.of<UserProvider>(context).userId;
-    String DisplayName = UserName == null ? '用户尚未登陆' : '当前用户ID：$UserName';
+    String? userName = Provider.of<UserProvider>(context).userId;
+    String displayName = userName == null ? '用户尚未登陆' : '当前用户ID：$userName';
     return Scaffold(
         appBar:
-            AppBar(title: Text('Meeting room appointment system $DisplayName')),
+            AppBar(title: Text('Meeting room appointment system $displayName')),
         drawer: AppDrawer(),
         body: Form(
             key: _formKey,
@@ -94,15 +94,14 @@ class HomePageState extends State<HomePageWidget> {
                   child: const Text('Submit'),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end, // 使按钮右对齐
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  RegisterPageWidget()), // 替换为你的注册页面
+                              builder: (context) => RegisterPageWidget()),
                         );
                       },
                       child: const Text('Register',
@@ -117,7 +116,6 @@ class HomePageState extends State<HomePageWidget> {
 
 Widget buildTitle() {
   return const Padding(
-      // 设置边距
       padding: EdgeInsets.all(8),
       child: Text(
         'Login',
