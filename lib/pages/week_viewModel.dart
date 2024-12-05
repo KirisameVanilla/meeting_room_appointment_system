@@ -67,13 +67,14 @@ class WeekViewState extends State<WeekView> {
   void bookSelectedSlots() {
     setState(() {
       try {
-        String? UserName =
+        String? userName =
             Provider.of<UserProvider>(context, listen: false).userId;
-        for (var _slot in selectedSlots) {
-          bookedSlots[selectedRoomIndex][selectedDayIndex][_slot] = UserName;
+        for (var slot in selectedSlots) {
+          bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = userName;
         }
 
         selectedSlots.clear(); // 清空已选中状态
+        // Todo: 使用convertToString(bookedSlots)保存
       } catch (e) {
         print(e);
       }
@@ -83,15 +84,16 @@ class WeekViewState extends State<WeekView> {
   // 取消选中预定的逻辑
   void cancelSelectedBookings() {
     setState(() {
-      String? UserName =
+      String? userName =
           Provider.of<UserProvider>(context, listen: false).userId;
-      for (var _slot in selectedSlots) {
-        if (UserName ==
-            bookedSlots[selectedRoomIndex][selectedDayIndex][_slot]) {
-          bookedSlots[selectedRoomIndex][selectedDayIndex][_slot] = "";
+      for (var slot in selectedSlots) {
+        if (userName ==
+            bookedSlots[selectedRoomIndex][selectedDayIndex][slot]) {
+          bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = "";
         }
       }
       selectedSlots.clear(); // 清空已选中状态
+      // Todo: 使用convertToString(bookedSlots)保存
       isCancelMode = false; // 退出取消模式
     });
   }
