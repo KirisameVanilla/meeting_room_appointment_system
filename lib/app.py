@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import json
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
@@ -9,6 +10,11 @@ basedir = os.path.abspath(os.path.dirname(__name__))
 
 app = Flask(__name__)
 CORS(app) # 防止跨域报错
+
+BOOKED_SLOTS_FILE = 'booked_slots.json'
+if not os.path.exists(BOOKED_SLOTS_FILE):
+    with open(BOOKED_SLOTS_FILE, 'w') as f:
+        json.dump({}, f)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'db/user.db')  # 使用 SQLite 数据库
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret'  # 设置 JWT 密钥
@@ -67,6 +73,30 @@ def login():
 @jwt_required()
 def protected():
     return jsonify({"message": "This is a protected route"}), 200
+
+@app.route('/save_slots', methods=['POST'])
+def save_slots():
+    try:
+        # 获取前端发送的数据
+        data = request.json  # Expecting JSON payload
+        # 保存到本地文件
+        with open(BOOKED_SLOTS_FILE, 'w') as file:
+            json.dump(data, file)
+        return jsonify({'message': 'Slots saved successfully!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_slots', methods=['GET'])
+def get_slots():
+    try:
+        # 从文件中读取数据
+        with open(BOOKED_SLOTS_FILE, 'r') as file:
+            data = json.load(file)
+        return jsonify(data), 200
+    except FileNotFoundError:
+        return jsonify({'message': 'No data found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # 启动服务器
 if __name__ == '__main__':

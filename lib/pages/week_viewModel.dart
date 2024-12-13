@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/time_slot_model.dart';
 import '../models/user_provider.dart';
-import '../data/booked_slots_model.dart'; // 导入 booked_slots.dart
+import '../data/booked_slots_model.dart';
+import '../api_service.dart';
 
 class WeekView extends StatefulWidget {
   @override
@@ -67,14 +68,14 @@ class WeekViewState extends State<WeekView> {
   void bookSelectedSlots() {
     setState(() {
       try {
+        final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
         String? userName =
             Provider.of<UserProvider>(context, listen: false).userId;
         for (var slot in selectedSlots) {
           bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = userName;
         }
-
         selectedSlots.clear(); // 清空已选中状态
-        // Todo: 使用convertToString(bookedSlots)保存
+        apiService.saveSlots();
       } catch (e) {
         print(e);
       }
@@ -84,6 +85,7 @@ class WeekViewState extends State<WeekView> {
   // 取消选中预定的逻辑
   void cancelSelectedBookings() {
     setState(() {
+      final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
       String? userName =
           Provider.of<UserProvider>(context, listen: false).userId;
       for (var slot in selectedSlots) {
@@ -93,9 +95,16 @@ class WeekViewState extends State<WeekView> {
         }
       }
       selectedSlots.clear(); // 清空已选中状态
-      // Todo: 使用convertToString(bookedSlots)保存
+      apiService.saveSlots();
       isCancelMode = false; // 退出取消模式
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
+    apiService.loadSlots();  // 加载本地文件中的预约数据
   }
 
   @override

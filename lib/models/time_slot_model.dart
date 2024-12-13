@@ -32,7 +32,7 @@ class TimeSlotWidget extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            occupiedBy != '' ? '$timeSlot\nOccupied by$occupiedBy' : timeSlot,
+            occupiedBy != '' ? '$timeSlot\nOccupied by\n$occupiedBy' : timeSlot,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
