@@ -77,6 +77,7 @@ class RegisterPageState extends State<RegisterPageWidget> {
                       print(_email);
                       print(_pwd);
                       apiService.registerUser(_email, _pwd);
+                      apiService.loadSlots();
                     } else {
                       // 如果验证失败，也可以给出提示
                       ScaffoldMessenger.of(context).showSnackBar(
