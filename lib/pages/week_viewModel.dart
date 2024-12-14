@@ -68,7 +68,8 @@ class WeekViewState extends State<WeekView> {
   void bookSelectedSlots() {
     setState(() {
       try {
-        final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
+        final ApiService apiService =
+            ApiService(baseUrl: 'http://localhost:5000');
         String? userName =
             Provider.of<UserProvider>(context, listen: false).userId;
         for (var slot in selectedSlots) {
@@ -85,7 +86,8 @@ class WeekViewState extends State<WeekView> {
   // 取消选中预定的逻辑
   void cancelSelectedBookings() {
     setState(() {
-      final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
+      final ApiService apiService =
+          ApiService(baseUrl: 'http://localhost:5000');
       String? userName =
           Provider.of<UserProvider>(context, listen: false).userId;
       for (var slot in selectedSlots) {
@@ -103,8 +105,8 @@ class WeekViewState extends State<WeekView> {
   @override
   void initState() {
     super.initState();
-    final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000'); 
-    apiService.loadSlots();  // 加载本地文件中的预约数据
+    final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000');
+    apiService.loadSlots(); // 加载本地文件中的预约数据
   }
 
   @override

@@ -1,11 +1,7 @@
 import 'dart:convert';
 
 List<List<Map<String, String?>>> bookedSlots =
-    List.generate(3, (_) => 
-        List.generate(7, (_) => 
-            Map.from(myMap)
-        )
-    );
+    List.generate(3, (_) => List.generate(7, (_) => Map.from(myMap)));
 
 Map<String, String> myMap = {
   '10:00 AM': "",
@@ -42,15 +38,15 @@ String convertToString(List<List<Map<String, String?>>> bookedSlots) {
 
 List<List<Map<String, String?>>> convertFromString(String jsonString) {
   var decodedJson = jsonDecode(jsonString);
-  
+
   // Ensure that the decodedJson is a List of Lists of Maps, and handle if it's not valid
   if (decodedJson is List) {
-    return (decodedJson as List).map((week) {
+    return (decodedJson).map((week) {
       if (week is List) {
-        return (week as List).map((day) {
+        return (week).map((day) {
           if (day is Map) {
             // Cast the Map to Map<String, String?> to ensure types match
-            return (day as Map).cast<String, String?>();
+            return (day).cast<String, String?>();
           } else {
             // Handle invalid data if needed
             return <String, String?>{};
@@ -64,10 +60,6 @@ List<List<Map<String, String?>>> convertFromString(String jsonString) {
   } else {
     // Handle error or invalid format, return an empty list or default values
     print("Error: Invalid data format.");
-    return List.generate(3, (_) => 
-      List.generate(7, (_) => 
-        Map.from(myMap)
-      )
-    );
+    return List.generate(3, (_) => List.generate(7, (_) => Map.from(myMap)));
   }
 }

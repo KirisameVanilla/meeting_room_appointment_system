@@ -84,6 +84,7 @@ class HomePageState extends State<HomePageWidget> {
                       Provider.of<UserProvider>(context, listen: false)
                           .setUserId(_email);
                       apiService.loginUser(_email, _pwd);
+                      apiService.loadSlots();
                     } else {
                       // 如果验证失败，也可以给出提示
                       ScaffoldMessenger.of(context).showSnackBar(

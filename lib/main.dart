@@ -77,13 +77,18 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('预定'), // 新增的菜单项
+            title: Text('预定'),
             onTap: () {
-              Navigator.pushNamed(context, '/book');
+              String? userName = Provider.of<UserProvider>(context).userId;
+              if (userName != null && userName != "") {
+                Navigator.pushNamed(context, '/book');
+              } else {
+                return;
+              }
             },
           ),
           ListTile(
-            title: Text('查看预定情况'), // 新增的菜单项
+            title: Text('查看预定情况'),
             onTap: () {
               Navigator.pushNamed(context, '/overview');
             },
