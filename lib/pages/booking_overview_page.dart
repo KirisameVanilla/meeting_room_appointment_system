@@ -10,6 +10,7 @@ class BookingOverviewPage extends StatelessWidget {
     required this.rooms,
     required this.timeSlots,
   });
+  
 
   @override
   Widget build(BuildContext context) {

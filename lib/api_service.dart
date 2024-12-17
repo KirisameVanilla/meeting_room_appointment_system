@@ -93,6 +93,80 @@ class ApiService {
     }
   }
 
+  void subscribeSlots() async {
+    try {
+      // 将 bookedSlots 转换为 JSON 字符串
+      String jsonString = json.encode(subscricedSlots);
 
+      // 发送到后端
+      final response = await http.post(
+        Uri.parse('http://127.0.0.1:5000/subscribe_slots'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonString,
+      );
+
+      if (response.statusCode == 200) {
+        print('Subscription saved successfully!');
+      } else {
+        print('Error subscriping slots: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception while subscriping slots: $e');
+    }
+  }
+
+  Future<void> loadSubscription() async {
+    try {
+      // 从后端获取 JSON 数据
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:5000/get_subscription'),
+      );
+
+      if (response.statusCode == 200) {
+        String jsonString = response.body;
+        if (jsonString == '{}\n' || jsonString.isEmpty) {
+        // 如果为空，则使用默认的初始化数据
+
+        subscricedSlots = List.generate(3, (_) => 
+          List.generate(7, (_) => 
+            Map.from(subMap)
+          )
+        );
+        subscribeSlots();
+        print('Subscription loaded as empty. Initialized with default values.');
+      } else {
+        // 如果 JSON 数据有效，则进行解析
+        subscricedSlots = convertFromStringSub(jsonString);
+        print('Subscription loaded successfully!');
+      }
+      } else {
+        print('Error loading Subscription: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception while loading Subscription: $e');
+    }
+  }
+
+  // 发送邮件通知
+  Future<void> sendCancellationEmails(List<String> emails, String slot) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/send_cancellation_emails'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'emails': emails,
+          'slot': slot,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Cancellation emails sent successfully!');
+      } else {
+        print('Error sending emails: ${response.body}');
+      }
+    } catch (e) {
+      print('Exception while sending emails: $e');
+    }
+  }
 
 }

@@ -35,6 +35,7 @@ class WeekViewState extends State<WeekView> {
   int selectedDayIndex = 0; // 当前选择的日期索引
   int selectedRoomIndex = 0; // 当前选择的会议室索引
   bool isCancelMode = false; // 取消模式状态
+  bool isSubscribeMode = false; // 订阅模式状态
 
   // 会议室列表
   final List<String> rooms = ['会议室 A', '会议室 B', '会议室 C'];
@@ -44,6 +45,15 @@ class WeekViewState extends State<WeekView> {
     setState(() {
       if (isCancelMode) {
         // 在取消模式下，允许选择已预定的时间块
+        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '') {
+          if (selectedSlots.contains(timeSlot)) {
+            selectedSlots.remove(timeSlot);
+          } else {
+            selectedSlots.add(timeSlot);
+          }
+        }
+      }
+      if (isSubscribeMode) {
         if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '') {
           if (selectedSlots.contains(timeSlot)) {
             selectedSlots.remove(timeSlot);
@@ -95,10 +105,33 @@ class WeekViewState extends State<WeekView> {
             bookedSlots[selectedRoomIndex][selectedDayIndex][slot]) {
           bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = "";
         }
+
+        List<String> subscribedEmails = List.from(subscricedSlots[selectedRoomIndex][selectedDayIndex][slot] ?? []);
+
+        // 调用后端 API 发送邮件通知
+        if (subscribedEmails.isNotEmpty) {
+          apiService.sendCancellationEmails(subscribedEmails, slot);
+        }
       }
       selectedSlots.clear(); // 清空已选中状态
       apiService.saveSlots();
       isCancelMode = false; // 退出取消模式
+    });
+  }
+  
+
+  void subscribeSelectedBookings() {
+    setState(() {
+      final ApiService apiService =
+          ApiService(baseUrl: 'http://localhost:5000');
+      String? userName =
+          Provider.of<UserProvider>(context, listen: false).userId;
+      for (var slot in selectedSlots) {
+        subscricedSlots[selectedRoomIndex][selectedDayIndex][slot]!.add(userName);
+      }
+      selectedSlots.clear(); // 清空已选中状态
+      apiService.subscribeSlots();
+      isSubscribeMode = false; // 退出取消模式
     });
   }
 
@@ -107,6 +140,7 @@ class WeekViewState extends State<WeekView> {
     super.initState();
     final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000');
     apiService.loadSlots(); // 加载本地文件中的预约数据
+    apiService.loadSubscription();
   }
 
   @override
@@ -182,6 +216,7 @@ class WeekViewState extends State<WeekView> {
                           selectTimeSlot(timeSlot);
                         },
                         isCancelMode: isCancelMode, // 传递取消模式状态
+                        isSubscribeMode :isSubscribeMode,
                         occupiedBy: bookedSlots[selectedRoomIndex]
                             [selectedDayIndex][timeSlot],
                       );
@@ -194,12 +229,12 @@ class WeekViewState extends State<WeekView> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed: selectedSlots.isNotEmpty && !isCancelMode
+                      onPressed: selectedSlots.isNotEmpty && !isCancelMode && !isSubscribeMode
                           ? bookSelectedSlots
                           : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            selectedSlots.isNotEmpty && !isCancelMode
+                            selectedSlots.isNotEmpty && !isCancelMode && !isSubscribeMode
                                 ? Colors.blue
                                 : Colors.grey,
                       ),
@@ -219,16 +254,79 @@ class WeekViewState extends State<WeekView> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        setState(() {
+                        if(isSubscribeMode){
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("错误"),
+                                content: Text("请先退出订阅模式再选择取消模式"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // 关闭对话框
+                                    },
+                                    child: Text("确认"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                        else {setState(() {
                           isCancelMode = !isCancelMode; // 切换取消模式状态
                           selectedSlots.clear(); // 切换模式时清空选择
-                        });
+                        });}
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             isCancelMode ? Colors.red : Colors.blue,
                       ),
                       child: Text(isCancelMode ? '退出取消模式' : '进入取消模式'),
+                    ),
+                    ElevatedButton(
+                      onPressed: isSubscribeMode && selectedSlots.isNotEmpty
+                          ? subscribeSelectedBookings
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isSubscribeMode && selectedSlots.isNotEmpty
+                                ? Colors.red
+                                : Colors.grey,
+                      ),
+                      child: Text('确认订阅'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if(isCancelMode){
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("错误"),
+                                content: Text("请先退出取消模式再选择订阅模式"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // 关闭对话框
+                                    },
+                                    child: Text("确认"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                        else {setState(() {
+                          isSubscribeMode = !isSubscribeMode; // 切换取消模式状态
+                          selectedSlots.clear(); // 切换模式时清空选择
+                        });}
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            isSubscribeMode ? Colors.red : Colors.blue,
+                      ),
+                      child: Text(isSubscribeMode ? '退出订阅模式' : '进入订阅模式'),
                     ),
                   ],
                 ),

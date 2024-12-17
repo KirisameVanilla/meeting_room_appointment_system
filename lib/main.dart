@@ -6,6 +6,7 @@ import 'pages/register_page.dart';
 import 'pages/home_page.dart';
 import 'data/booked_slots_model.dart';
 import 'models/user_provider.dart';
+import '../api_service.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -20,6 +21,14 @@ class ConferenceRoomApp extends StatefulWidget {
 }
 
 class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
+  
+  @override
+  void initState() {
+    super.initState();
+    final ApiService apiService = ApiService(baseUrl: 'http://localhost:5000');
+    apiService.loadSlots(); // 加载本地文件中的预约数据
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,7 +66,10 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
   }
 }
 
+
+
 class AppDrawer extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -79,10 +91,27 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: Text('预定'),
             onTap: () {
-              String? userName = Provider.of<UserProvider>(context).userId;
+              String? userName = Provider.of<UserProvider>(context, listen: false).userId;
               if (userName != null && userName != "") {
                 Navigator.pushNamed(context, '/book');
-              } else {
+              } else {            
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("未登录"),
+                      content: Text("请先登录再访问预订页面"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 关闭对话框
+                          },
+                          child: Text("确认"),
+                        ),
+                      ],
+                    );
+                  },
+                );
                 return;
               }
             },

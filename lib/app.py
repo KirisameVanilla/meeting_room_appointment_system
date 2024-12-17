@@ -4,6 +4,9 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 
 basedir = os.path.abspath(os.path.dirname(__name__))
@@ -14,6 +17,11 @@ CORS(app) # 防止跨域报错
 BOOKED_SLOTS_FILE = 'booked_slots.json'
 if not os.path.exists(BOOKED_SLOTS_FILE):
     with open(BOOKED_SLOTS_FILE, 'w') as f:
+        json.dump({}, f)
+
+SUBSCRIBED_SLOTS_FILE = 'subscribed_slots.json'
+if not os.path.exists(SUBSCRIBED_SLOTS_FILE):
+    with open(SUBSCRIBED_SLOTS_FILE, 'w') as f:
         json.dump({}, f)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'db/user.db')  # 使用 SQLite 数据库
@@ -97,6 +105,69 @@ def get_slots():
         return jsonify({'message': 'No data found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/subscribe_slots', methods=['POST'])
+def subscribe_slots():
+    try:
+        # 获取前端发送的数据
+        data = request.json  # Expecting JSON payload
+        # 保存到本地文件
+        with open(SUBSCRIBED_SLOTS_FILE, 'w') as file:
+            json.dump(data, file)
+        return jsonify({'message': 'Slots subscribed successfully!'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_subscription', methods=['GET'])
+def get_subscription():
+    try:
+        # 从文件中读取数据
+        with open(SUBSCRIBED_SLOTS_FILE, 'r') as file:
+            data = json.load(file)
+        return jsonify(data), 200
+    except FileNotFoundError:
+        return jsonify({'message': 'No data found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/send_cancellation_emails', methods=['POST'])
+def send_cancellation_emails():
+    data = request.json
+    emails = data.get('emails', [])
+    slot = data.get('slot', '')
+
+    if not emails or not slot:
+        return jsonify({'error': 'Missing email addresses or time slot'}), 400
+
+    # 邮件发送逻辑
+    for email in emails:
+        send_email(email, slot)
+    
+    return jsonify({'message': 'Emails sent successfully'}), 200
+
+def send_email(to_email, slot):
+    from_email = "1834576129@qq.com"
+    password = "mjisawnszjgyddjc"
+    
+    subject = "Booking Cancellation Notification"
+    body = f"Booking for the time slot {slot} has been cancelled."
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    try:
+        server = smtplib.SMTP_SSL('smtp.qq.com',465)
+        server.login(from_email, password)
+        server.sendmail(from_email, to_email, msg.as_string())
+        server.close()
+        print(f"Email sent to {to_email}")
+    except Exception as e:
+        print(f"Failed to send email to {to_email}: {e}")
 
 # 启动服务器
 if __name__ == '__main__':
