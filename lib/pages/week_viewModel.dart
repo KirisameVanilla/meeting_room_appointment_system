@@ -43,9 +43,12 @@ class WeekViewState extends State<WeekView> {
   // 选择时间块的逻辑
   void selectTimeSlot(String timeSlot) {
     setState(() {
+      String? userName =
+          Provider.of<UserProvider>(context, listen: false).userId;
       if (isCancelMode) {
         // 在取消模式下，允许选择已预定的时间块
-        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '') {
+        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] ==
+            userName) {
           if (selectedSlots.contains(timeSlot)) {
             selectedSlots.remove(timeSlot);
           } else {
@@ -54,7 +57,9 @@ class WeekViewState extends State<WeekView> {
         }
       }
       if (isSubscribeMode) {
-        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '') {
+        if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] != '' &&
+            bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] !=
+                userName) {
           if (selectedSlots.contains(timeSlot)) {
             selectedSlots.remove(timeSlot);
           } else {
@@ -106,7 +111,8 @@ class WeekViewState extends State<WeekView> {
           bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = "";
         }
 
-        List<String> subscribedEmails = List.from(subscricedSlots[selectedRoomIndex][selectedDayIndex][slot] ?? []);
+        List<String> subscribedEmails = List.from(
+            subscricedSlots[selectedRoomIndex][selectedDayIndex][slot] ?? []);
 
         // 调用后端 API 发送邮件通知
         if (subscribedEmails.isNotEmpty) {
@@ -118,7 +124,6 @@ class WeekViewState extends State<WeekView> {
       isCancelMode = false; // 退出取消模式
     });
   }
-  
 
   void subscribeSelectedBookings() {
     setState(() {
@@ -127,7 +132,8 @@ class WeekViewState extends State<WeekView> {
       String? userName =
           Provider.of<UserProvider>(context, listen: false).userId;
       for (var slot in selectedSlots) {
-        subscricedSlots[selectedRoomIndex][selectedDayIndex][slot]!.add(userName);
+        subscricedSlots[selectedRoomIndex][selectedDayIndex][slot]!
+            .add(userName);
       }
       selectedSlots.clear(); // 清空已选中状态
       apiService.subscribeSlots();
@@ -216,7 +222,7 @@ class WeekViewState extends State<WeekView> {
                           selectTimeSlot(timeSlot);
                         },
                         isCancelMode: isCancelMode, // 传递取消模式状态
-                        isSubscribeMode :isSubscribeMode,
+                        isSubscribeMode: isSubscribeMode,
                         occupiedBy: bookedSlots[selectedRoomIndex]
                             [selectedDayIndex][timeSlot],
                       );
@@ -229,14 +235,17 @@ class WeekViewState extends State<WeekView> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed: selectedSlots.isNotEmpty && !isCancelMode && !isSubscribeMode
+                      onPressed: selectedSlots.isNotEmpty &&
+                              !isCancelMode &&
+                              !isSubscribeMode
                           ? bookSelectedSlots
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            selectedSlots.isNotEmpty && !isCancelMode && !isSubscribeMode
-                                ? Colors.blue
-                                : Colors.grey,
+                        backgroundColor: selectedSlots.isNotEmpty &&
+                                !isCancelMode &&
+                                !isSubscribeMode
+                            ? Colors.blue
+                            : Colors.grey,
                       ),
                       child: Text('预定选中的时间块'),
                     ),
@@ -254,7 +263,7 @@ class WeekViewState extends State<WeekView> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if(isSubscribeMode){
+                        if (isSubscribeMode) {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -272,11 +281,12 @@ class WeekViewState extends State<WeekView> {
                               );
                             },
                           );
+                        } else {
+                          setState(() {
+                            isCancelMode = !isCancelMode; // 切换取消模式状态
+                            selectedSlots.clear(); // 切换模式时清空选择
+                          });
                         }
-                        else {setState(() {
-                          isCancelMode = !isCancelMode; // 切换取消模式状态
-                          selectedSlots.clear(); // 切换模式时清空选择
-                        });}
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
@@ -298,7 +308,7 @@ class WeekViewState extends State<WeekView> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        if(isCancelMode){
+                        if (isCancelMode) {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -316,11 +326,12 @@ class WeekViewState extends State<WeekView> {
                               );
                             },
                           );
+                        } else {
+                          setState(() {
+                            isSubscribeMode = !isSubscribeMode; // 切换取消模式状态
+                            selectedSlots.clear(); // 切换模式时清空选择
+                          });
                         }
-                        else {setState(() {
-                          isSubscribeMode = !isSubscribeMode; // 切换取消模式状态
-                          selectedSlots.clear(); // 切换模式时清空选择
-                        });}
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:

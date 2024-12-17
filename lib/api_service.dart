@@ -14,7 +14,7 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password}),
     );
-    
+
     if (response.statusCode == 201) {
       print('User registered successfully');
     } else {
@@ -71,20 +71,17 @@ class ApiService {
         // 解析 JSON 字符串为 bookedSlots
         String jsonString = response.body;
         if (jsonString == '{}\n' || jsonString.isEmpty) {
-        // 如果为空，则使用默认的初始化数据
+          // 如果为空，则使用默认的初始化数据
 
-        bookedSlots = List.generate(3, (_) => 
-          List.generate(7, (_) => 
-            Map.from(myMap)
-          )
-        );
-        saveSlots();
-        print('Slots loaded as empty. Initialized with default values.');
-      } else {
-        // 如果 JSON 数据有效，则进行解析
-        bookedSlots = convertFromString(jsonString);
-        print('Slots loaded successfully!');
-      }
+          bookedSlots =
+              List.generate(3, (_) => List.generate(7, (_) => Map.from(myMap)));
+          saveSlots();
+          print('Slots loaded as empty. Initialized with default values.');
+        } else {
+          // 如果 JSON 数据有效，则进行解析
+          bookedSlots = convertFromString(jsonString);
+          print('Slots loaded successfully!');
+        }
       } else {
         print('Error loading slots: ${response.body}');
       }
@@ -125,20 +122,18 @@ class ApiService {
       if (response.statusCode == 200) {
         String jsonString = response.body;
         if (jsonString == '{}\n' || jsonString.isEmpty) {
-        // 如果为空，则使用默认的初始化数据
+          // 如果为空，则使用默认的初始化数据
 
-        subscricedSlots = List.generate(3, (_) => 
-          List.generate(7, (_) => 
-            Map.from(subMap)
-          )
-        );
-        subscribeSlots();
-        print('Subscription loaded as empty. Initialized with default values.');
-      } else {
-        // 如果 JSON 数据有效，则进行解析
-        subscricedSlots = convertFromStringSub(jsonString);
-        print('Subscription loaded successfully!');
-      }
+          subscricedSlots = List.generate(
+              3, (_) => List.generate(7, (_) => Map.from(subMap)));
+          subscribeSlots();
+          print(
+              'Subscription loaded as empty. Initialized with default values.');
+        } else {
+          // 如果 JSON 数据有效，则进行解析
+          subscricedSlots = convertFromStringSub(jsonString);
+          print('Subscription loaded successfully!');
+        }
       } else {
         print('Error loading Subscription: ${response.body}');
       }
@@ -168,5 +163,4 @@ class ApiService {
       print('Exception while sending emails: $e');
     }
   }
-
 }

@@ -21,7 +21,6 @@ class ConferenceRoomApp extends StatefulWidget {
 }
 
 class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
-  
   @override
   void initState() {
     super.initState();
@@ -66,10 +65,7 @@ class _ConferenceRoomAppState extends State<ConferenceRoomApp> {
   }
 }
 
-
-
 class AppDrawer extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -91,10 +87,11 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             title: Text('预定'),
             onTap: () {
-              String? userName = Provider.of<UserProvider>(context, listen: false).userId;
+              String? userName =
+                  Provider.of<UserProvider>(context, listen: false).userId;
               if (userName != null && userName != "") {
                 Navigator.pushNamed(context, '/book');
-              } else {            
+              } else {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {

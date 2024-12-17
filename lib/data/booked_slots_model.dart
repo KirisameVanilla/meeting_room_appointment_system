@@ -100,7 +100,7 @@ List<List<Map<String, List>>> convertFromStringSub(String jsonString) {
             return day.cast<String, List>(); // 将 Map<String, List> 强制转换为指定类型
           } else {
             // 如果不是 Map 类型，返回一个空的 Map
-            return <String, List> {};
+            return <String, List>{};
           }
         }).toList();
       } else {
