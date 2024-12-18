@@ -88,11 +88,27 @@ def save_slots():
         # 获取前端发送的数据
         data = request.json  # Expecting JSON payload
         # 保存到本地文件
-        with open(BOOKED_SLOTS_FILE, 'w') as file:
-            json.dump(data, file)
+        with open(BOOKED_SLOTS_FILE, 'r') as file:
+            old_data = json.load(file)
+        if not detect_and_prevent_change(old_data, data):
+            return jsonify({'error: conflict'}), 500
+        else:
+            with open(BOOKED_SLOTS_FILE, 'w') as file:
+                json.dump(data, file)
         return jsonify({'message': 'Slots saved successfully!'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+def detect_and_prevent_change(data, new_data):
+    for room_index, room in enumerate(data):
+        for day_index, day in enumerate(room):
+            for time_slot, value in day.items():
+                original_value = value
+                new_value = new_data[room_index][day_index][time_slot]
+                if original_value and original_value != new_value and new_value:
+                    # 互斥提示
+                    return False
+    return True
 
 @app.route('/get_slots', methods=['GET'])
 def get_slots():

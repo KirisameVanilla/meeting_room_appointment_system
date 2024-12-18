@@ -38,7 +38,7 @@ class ApiService {
     }
   }
 
-  void saveSlots() async {
+  Future<bool> saveSlots() async {
     try {
       // 将 bookedSlots 转换为 JSON 字符串
       String jsonString = convertToString(bookedSlots);
@@ -52,11 +52,14 @@ class ApiService {
 
       if (response.statusCode == 200) {
         print('Slots saved successfully!');
+        return true;
       } else {
         print('Error saving slots: ${response.body}');
+        return false;
       }
     } catch (e) {
       print('Exception while saving slots: $e');
+      return false;
     }
   }
 

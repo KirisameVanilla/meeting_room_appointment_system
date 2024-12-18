@@ -48,16 +48,6 @@ String convertToString(List<List<Map<String, String?>>> bookedSlots) {
   return jsonEncode(bookedSlots);
 }
 
-/* List<List<Map<String, String?>>> convertFromString(String jsonString) {
-  var decodedJson = jsonDecode(jsonString);
-  List<List<Map<String, String?>>> bookedSlots = (decodedJson as List)
-      .map((week) => (week as List)
-          .map((day) => (day as Map).cast<String, String?>())
-          .toList())
-      .toList();
-  return bookedSlots;
-} */
-
 List<List<Map<String, String?>>> convertFromString(String jsonString) {
   var decodedJson = jsonDecode(jsonString);
 

@@ -80,27 +80,36 @@ class WeekViewState extends State<WeekView> {
   }
 
   // 预定选中时间块的逻辑
-  void bookSelectedSlots() {
-    setState(() {
-      try {
-        final ApiService apiService =
-            ApiService(baseUrl: 'http://localhost:5000');
-        String? userName =
-            Provider.of<UserProvider>(context, listen: false).userId;
-        for (var slot in selectedSlots) {
-          bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = userName;
-        }
-        selectedSlots.clear(); // 清空已选中状态
-        apiService.saveSlots();
-      } catch (e) {
-        print(e);
+  void bookSelectedSlots() async {
+    try {
+      final ApiService apiService =
+          ApiService(baseUrl: 'http://localhost:5000');
+      String? userName =
+          Provider.of<UserProvider>(context, listen: false).userId;
+
+      // 更新选中的预订状态
+      for (var slot in selectedSlots) {
+        bookedSlots[selectedRoomIndex][selectedDayIndex][slot] = userName;
       }
-    });
+
+      // 保存预订
+      bool isSuccess = await apiService.saveSlots();
+
+      // 根据保存结果更新状态
+      selectedSlots.clear();
+      setState(() {
+        if (!isSuccess) {
+          apiService.loadSlots();
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   // 取消选中预定的逻辑
-  void cancelSelectedBookings() {
-    setState(() {
+  void cancelSelectedBookings() async {
+    try {
       final ApiService apiService =
           ApiService(baseUrl: 'http://localhost:5000');
       String? userName =
@@ -119,10 +128,19 @@ class WeekViewState extends State<WeekView> {
           apiService.sendCancellationEmails(subscribedEmails, slot);
         }
       }
-      selectedSlots.clear(); // 清空已选中状态
-      apiService.saveSlots();
-      isCancelMode = false; // 退出取消模式
-    });
+      selectedSlots.clear();
+      bool isSuccess = await apiService.saveSlots();
+
+      selectedSlots.clear();
+      isCancelMode = false;
+      setState(() {
+        if (!isSuccess) {
+          apiService.loadSlots();
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   void subscribeSelectedBookings() {
