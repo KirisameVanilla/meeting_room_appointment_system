@@ -45,6 +45,9 @@ class WeekViewState extends State<WeekView> {
     setState(() {
       String? userName =
           Provider.of<UserProvider>(context, listen: false).userId;
+      if (userName == null || userName == "") {
+        return;
+      }
       if (isCancelMode) {
         // 在取消模式下，允许选择已预定的时间块
         if (bookedSlots[selectedRoomIndex][selectedDayIndex][timeSlot] ==
