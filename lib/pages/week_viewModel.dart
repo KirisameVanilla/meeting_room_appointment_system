@@ -99,8 +99,8 @@ class WeekViewState extends State<WeekView> {
       bool isSuccess = await apiService.saveSlots();
 
       // 根据保存结果更新状态
-      selectedSlots.clear();
       setState(() {
+        selectedSlots.clear();
         if (!isSuccess) {
           apiService.loadSlots();
         }
@@ -134,9 +134,9 @@ class WeekViewState extends State<WeekView> {
       selectedSlots.clear();
       bool isSuccess = await apiService.saveSlots();
 
-      selectedSlots.clear();
-      isCancelMode = false;
       setState(() {
+        selectedSlots.clear();
+        isCancelMode = false;
         if (!isSuccess) {
           apiService.loadSlots();
         }
@@ -225,7 +225,7 @@ class WeekViewState extends State<WeekView> {
                   child: GridView.builder(
                     itemCount: timeSlots.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 每行显示两个时间块
+                      crossAxisCount: 4, // 每行显示两个时间块
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 4.0,
                       childAspectRatio: 3.0, // 控制每个时间块的宽高比
