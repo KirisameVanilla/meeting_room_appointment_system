@@ -35,7 +35,7 @@ class BookingOverviewPage extends StatelessWidget {
             ),
             // 遍历会议室
             for (int dateIndex = 0; dateIndex < 7; dateIndex++) ...[
-              Text("第${(dateIndex)}天"),
+              Text("第${(dateIndex+1)}天"),
               for (int roomIndex = 0; roomIndex < rooms.length; roomIndex++)
                 Row(
                   children: [

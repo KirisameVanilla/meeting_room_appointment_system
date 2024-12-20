@@ -102,6 +102,23 @@ class WeekViewState extends State<WeekView> {
       setState(() {
         selectedSlots.clear();
         if (!isSuccess) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("冲突"),
+                content: Text("已有其他用户快您一步预定啦，下次快点！"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 关闭对话框
+                    },
+                    child: Text("确认"),
+                  ),
+                ],
+              );
+            },
+          );
           apiService.loadSlots();
         }
       });
@@ -131,15 +148,10 @@ class WeekViewState extends State<WeekView> {
           apiService.sendCancellationEmails(subscribedEmails, slot);
         }
       }
-      selectedSlots.clear();
-      bool isSuccess = await apiService.saveSlots();
-
       setState(() {
         selectedSlots.clear();
         isCancelMode = false;
-        if (!isSuccess) {
-          apiService.loadSlots();
-        }
+        apiService.saveSlots();
       });
     } catch (e) {
       print(e);
